@@ -65,11 +65,17 @@ const galleryItems = [
 ];
 
 const listGallery = document.querySelector(".js-gallery");
+const modalForm = document.querySelector(".js-lightbox");
+const modalImage = modalForm.querySelector(".lightbox__image");
+const btnClose = modalForm.querySelector(
+  `button[data-action="close-lightbox"]`
+);
+const refBackdrop = modalForm.querySelector(".lightbox__overlay");
 
 const gallery = galleryItems.map(
   ({ preview, original, description }) =>
     `<li class="gallery__item">
-   <a class="gallery__link" href="${original}">
+   <a class="gallery__link" href="#">
      <img class="gallery__image"
        src="${preview}"
        data-source="${original}"
@@ -82,6 +88,38 @@ listGallery.insertAdjacentHTML("afterbegin", gallery.join(" "));
 
 listGallery.addEventListener("click", onOpenModalForm);
 
-function onOpenModalForm (e) {
-      console.log(e.target);
+function onOpenModalForm(e) {
+  if (e.target.nodeName !== "IMG") {
+    return;
+  }
+  modalForm.classList.add("is-open");
+
+  if (e.target.dataset.source) {
+    modalImage.src = e.target.dataset.source;
+    modalImage.alt = e.target.alt;
+  }
+}
+
+btnClose.addEventListener("click", onCloseModal);
+
+function onCloseModal() {
+  modalForm.classList.remove("is-open");
+  modalImage.removeAttribute("src");
+  modalImage.removeAttribute("alt")
+}
+
+refBackdrop.addEventListener("click", onCLoseBackdrop);
+
+function onCLoseBackdrop(e) {
+  if (e.target) {
+    onCloseModal();
+  }
+}
+
+document.addEventListener("keydown", onCloseKey);
+
+function onCloseKey(e) {
+  if (e.code === "Escape") {
+    onCloseModal();
+  }
 }
