@@ -84,6 +84,8 @@ const gallery = galleryItems.map(
     </li>`
 );
 
+let currentItem;
+
 listGallery.insertAdjacentHTML("afterbegin", gallery.join(" "));
 
 listGallery.addEventListener("click", onOpenModalForm);
@@ -98,6 +100,13 @@ function onOpenModalForm(e) {
     modalImage.src = e.target.dataset.source;
     modalImage.alt = e.target.alt;
   }
+
+  const currentLink = e.target.dataset.source;
+  currentItem = getCurrentItem(currentLink);
+}
+
+function getCurrentItem(src) {
+  return galleryItems.find((el) => el.original === src);
 }
 
 btnClose.addEventListener("click", onCloseModal);
@@ -105,7 +114,7 @@ btnClose.addEventListener("click", onCloseModal);
 function onCloseModal() {
   modalForm.classList.remove("is-open");
   modalImage.removeAttribute("src");
-  modalImage.removeAttribute("alt")
+  modalImage.removeAttribute("alt");
 }
 
 refBackdrop.addEventListener("click", onCLoseBackdrop);
@@ -122,4 +131,42 @@ function onCloseKey(e) {
   if (e.code === "Escape") {
     onCloseModal();
   }
+}
+
+window.addEventListener("keydown", onPressArrow);
+function onPressArrow(e) {
+  if (!(e.code === "ArrowRight" || e.code === "ArrowLeft")) {
+    return;
+  }
+
+  if (e.code === "ArrowRight") {
+    const nextItem = getNextItem(currentItem);
+    modalChange(nextItem);
+    currentItem = nextItem;
+  }
+
+  if (e.code === "ArrowLeft") {
+    const prevItem = getPrevItem(currentItem);
+    modalChange(prevItem);
+    currentItem = prevItem;
+  }
+}
+
+const getNextItem = (currentItem) => {
+  const index = galleryItems.indexOf(currentItem);
+  return index === galleryItems.length - 1
+    ? galleryItems[0]
+    : galleryItems[index + 1];
+};
+
+const getPrevItem = (currentItem) => {
+  const index = galleryItems.indexOf(currentItem);
+  return index === 0
+    ? galleryItems[galleryItems.length - 1]
+    : galleryItems[index - 1];
+};
+
+function modalChange(el) {
+  modalImage.src = el.original;
+  modalImage.alt = el.description;
 }
